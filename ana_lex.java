@@ -7,21 +7,21 @@ import static utils.LexerHelper.*;
 
 public class Lexer {
 
-    private final char eofCh = '\004';
-    private final char eolnCh = '\n';
+    private final char eofCh = '\004';  //we define the end of the file
+    private final char eolnCh = '\n';   //we define the end of the line
     private BufferedReader input;
-    private char ch = ' ';
+    private char ch = ' ';  
     private String line = "";
-    private int lineno = 0;
-    private int col = 1;
+    private int lineno = 0; //?
+    private int col = 1; //?
 
 
     public Lexer(String fileName) {
 
         try {
-            input = new BufferedReader(new FileReader(fileName));
+            input = new BufferedReader(new FileReader(fileName)); //We define a buffern and we include our file into this buffer
         } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + fileName);
+            System.out.println("File not found: " + fileName); //if we didn't foind the file
             System.exit(1);
         }
 
