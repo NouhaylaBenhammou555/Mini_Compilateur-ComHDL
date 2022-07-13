@@ -1,0 +1,74 @@
+
+Axiome : { PROGRAM }
+
+# **Some tokens definitions :**
+
+ID ⇒ lettre {lettre | chiffre}
+NUM ⇒ chiffre {chiffre}
+Chiffre ⇒ 0|..|9
+Lettre ⇒ a|b|..|z|A|..|Z
+
+aco = '{'
+acf = '}'
+
+# ** La grammaire P **:
+
+PROGRAM => ADD { ADD }
+ADD => add ( ID KIND VALUE TYPE STATE ALLOCATE  USE RUN )
+----------------------------------------------------------
+KIND  => epsilon | ,kind=" K
+K => if", IFDEF |for ", FORDEF |when", SWITCHDEF | struct", STRUCT |function", FUNCTION
+
+FUNCTION => (PARMS) => aco INSTS acf 
+IFDEF    => ( CONDITION ) ? aco INSTS acf  : aco INSTS acf
+FORDEF   => (ID) => aco INSTS acf  
+STRUCT   => ( AFFEC { , AFFEC} ) => aco ID -> TYPES { ID -> TYPES } acof   
+SWITCHDEF => (ID) => aco INSTS acf
+
+VALUE => ,VAL | epsilon 
+  VAL   =>  EXPR
+      => [ARRAY]
+      =>  NUM..NUM            //range                                          
+ 
+ARRAY =>  EXPR { , EXPR } | epsilon                                                      
+PARMS => epsilon| ID { , ID }
+
+---------------------------------------------
+TYPE  => epsilon | , type = " TYPES {[]} "
+STATE => epsilon | , state = " S "
+S    => immutable|nonNullable|nullable
+
+USE   => epsilon | , use = NUM 
+RUN   => epsilon | , run=" R "
+R => asynchronous|synchronous	
+ALLOCATE => epsilon |, allocate = " chiffre * sizeof ( TYPES ) "
+-------------------------------------------------------------------------------------------
+TYPES => void | char | short | int | long | float | double | signed | unsigned | string | pipe
+---------------------------------------------------------------------------------------
+INSTS =>  INST { INST } 
+INST  => epsilon | WRITE | BLOCIF | BLOCFOR | BLOCWHILE | AFFEC | ADD |RETURN | break | WHENINST | PARINST | DELETEINST
+----------------------------------------------------------
+WRITE  => log( " { {ID|symbole|chiffre} $ aco ID acf {ID|symbole|chiffre}  } " | ID )
+
+BLOCIF  => if ( CONDITION ) aco INSTS acf ELSE
+	=> CONDITION ? aco INSTS acf : aco INSTS acf
+ELSE    => epsilon | else aco INSTS acf
+AFFEC   => ID = READ
+READ => EXPR | scan()
+
+BLOCFOR ⇒ for (AFFEC , CONDITION , INST) aco INSTS acof 
+BLOCWHILE ⇒  while ( CONDITION ) aco INSTS acof
+WHENINST => NUM -> INST 
+RETURN => return EXPR 
+PARINST => params ( ID )
+DELETEINST => del ( ID )
+-----------------------------------------------------------------------------
+CONDITION  => EXPR RELOP EXPR
+RELOP => = | <> | < | > | <= | >=
+EXPR => TERM ( (PARAMS) || { ADDOP TERM } ) // (PARAMS) appel de fonction
+ADDOP => + | -
+TERM => FACT { MULOP FACT }
+MULOP => * | /
+FACT => ID | NUM | ( EXPR )
+----------------------------------------------------------------------
+
